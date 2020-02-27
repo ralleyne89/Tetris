@@ -1,8 +1,8 @@
 import React, {useState} from 'react';
-import {createStage} from '../gameHelpers'
+import {createStage, checkCollision} from '../gameHelpers';
 
 // Styled components
-import { StyledTetrisWrapper, StyledTetris} from './styles/StyledTetris'
+import {StyledTetrisWrapper, StyledTetris} from './styles/StyledTetris';
 
 // Components
 import Stage from './Stage';
@@ -10,67 +10,80 @@ import Display from './Display';
 import StartButton from './StartButton';
 
 // Custom Hooks
-import {usePlayer} from '../hooks/usePlayer'
-import {useStage} from '../hooks/useStage'
+import {usePlayer} from '../hooks/usePlayer';
+import {useStage} from '../hooks/useStage';
 
 const Tetris = () => {
-  const [dropTime, setDropTime] = useState(null)
-  const [gameOver, setGameOver] = useState(false)
+  const [dropTime, setDropTime] = useState(null);
+  const [gameOver, setGameOver] = useState(false);
 
-  const [player, updatePlayerPos, resetPlayer] = usePlayer()
-  const [stage, setStage] = useStage(player, resetPlayer)
+  const [player, updatePlayerPos, resetPlayer] = usePlayer();
+  const [stage, setStage] = useStage(player, resetPlayer);
 
-  console.log('re-render')
+  console.log('re-render');
 
-const movePlayer = dir => {
-  updatePlayerPos({x: dir, y: 0})
-}
+  const movePlayer = dir => {
+    if(!checkCollision(player, stage, {x: dir, y: 0})) {
+      updatePlayerPos({x: dir, y: 0})
+    }
+  };
 
-const startGame = () => {
-  // RESET
-  setStage(createStage())
-  resetPlayer()
-}
+  const startGame = () => {
+    // RESET
+    setStage(createStage());
+    resetPlayer();
+    setGameOver(false);
+  };
 
-const drop = () => {
-  updatePlayerPos({x: 0, y: 1, collided: false})
-}
-
-const dropPlayer = () => {
-  drop()
-}
-
-const move = ({keyCode}) => {
-  if(!gameOver) {
-    if(keyCode === 37) {
-      // MOVE LEFT
-      movePlayer(-1)
-    } else if (keyCode === 39) {
-      // MOVE RIGHT
-      movePlayer(1)
-    } else if (keyCode === 40) {
-      // MOVE DOWN
-      dropPlayer()
+  const drop = () => {
+    if (!checkCollision(player, stage, { x: 0, y: 1 })) {
+      updatePlayerPos({ x: 0, y: 1, collided: false })
+    } else {
+      // Game Over
+      if (player.pos.y < 1) {
+        console.log("GAME OVER!!!");
+        setGameOver(true);
+        setDropTime(null);
+      }
+      updatePlayerPos({ x: 0, y: 0, collided: true });
     }
   }
-}
+
+  const dropPlayer = () => {
+    drop();
+  };
+
+  const move = ({keyCode}) => {
+    if (!gameOver) {
+      if (keyCode === 37) {
+        // MOVE LEFT
+        movePlayer(-1);
+      } else if (keyCode === 39) {
+        // MOVE RIGHT
+        movePlayer(1);
+      } else if (keyCode === 40) {
+        // MOVE DOWN
+        dropPlayer();
+      }
+    }
+  };
 
   return (
-    <StyledTetrisWrapper role='button' tabIndex='0' onKeyDown={e => move(e)}>
+    <StyledTetrisWrapper role="button" tabIndex="0" onKeyDown={e => move(e)}>
       <StyledTetris>
-      <Stage stage={stage} />
-      <aside>
-        {gameOver ? (
-          <Display gameOver={gameOver} text='Game Over'/>
-        ) : (
-          <div>
-            <Display text='Score'/>
-            <Display text='Rows'/>
-            <Display text='Level'/>
-          </div>
-        )}
-        <StartButton callback={startGame} />
-      </aside>
+        <Stage stage={stage} />
+        <aside>
+          {gameOver ? (
+            <Display gameOver={gameOver} text="Game Over" />
+          ) : (
+            <div>
+              <Display text="Score" />
+              <Display text="Rows" />
+              <Display text="Level" />
+            </div>
+          )}
+          <StartButton callback={startGame} />
+        </aside>
       </StyledTetris>
     </StyledTetrisWrapper>
   );
