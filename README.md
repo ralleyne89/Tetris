@@ -2,6 +2,8 @@
 
 The classic arcade game Tetris created using React
 
+![Show Tetris](./public/tetris_start.png)
+
 ![Show Tetris](./public/tetris.png)
 
 ## Technologies
