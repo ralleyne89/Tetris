@@ -1,8 +1,6 @@
 ## Tetris
 
 A gaming classic recreated with React.js 
-             
-## Summary
 
 Tetris is a tile-matching puzzle video game. The goal is to destroy lines of block before it reaches the top. As you level up the speed of the block decent will increase, making it more difficult. Using arrows to move the tetrominos into place will result in points add to your score. This was done as a project to learn React and develop an understanding of components and hooks. 
 
